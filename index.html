@@ -323,7 +323,8 @@
 
     // filter chips
     var counts={}; TYPES.forEach(function(ty){counts[ty]=up.filter(function(x){return x.r.type===ty;}).length;});
-    var chipHtml='<button class="fchip" data-f="all">All</button>'+TYPES.filter(function(ty){return counts[ty]>0;}).map(function(ty){return '<button class="fchip" data-f="'+ty+'">'+ty+'s</button>';}).join("");
+    function plural(ty){return ty==="Policy"?"Policies":ty+"s";}
+    var chipHtml='<button class="fchip" data-f="all">All</button>'+TYPES.filter(function(ty){return counts[ty]>0;}).map(function(ty){return '<button class="fchip" data-f="'+ty+'">'+plural(ty)+'</button>';}).join("");
     document.getElementById("chips").innerHTML=chipHtml;
 
     // rotations grid
