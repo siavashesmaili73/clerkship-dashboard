@@ -139,6 +139,43 @@
   .kd.aud{background:var(--rosebg);color:var(--rose)} .kd.elec{background:var(--amberbg);color:var(--amber)}
   .foot{color:var(--sub);font-size:12px;margin-top:28px;line-height:1.6;text-align:center}
   #err{color:var(--rose);font-size:13px;white-space:pre-wrap;margin-top:14px}
+  /* flags */
+  .flags{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:14px}
+  .flag{border:1px solid var(--line);border-left:4px solid var(--slate);border-radius:12px;padding:11px 13px;background:var(--card);box-shadow:var(--shadow)}
+  .flag.red{border-left-color:var(--rose)}.flag.amber{border-left-color:var(--amber)}.flag.green{border-left-color:var(--emer)}
+  .flag .ft{font-weight:700;font-size:13px}
+  .flag .fd{color:var(--sub);font-size:12px;margin-top:4px;line-height:1.5}
+  /* courses */
+  .coursewrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+  .course{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--brand);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
+  .course.a-violet{border-top-color:var(--violet)}.course.a-sky{border-top-color:var(--sky)}
+  .chead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .ccode{font-weight:800}.cname{color:var(--sub);font-size:13px}
+  .cstat{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--slatebg);color:var(--slate);white-space:nowrap}
+  .cblurb{color:var(--sub);font-size:12.5px;margin-top:6px}
+  .csub{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--brand);font-weight:800;margin-top:12px}
+  .course ul{margin:6px 0 0;padding-left:18px}
+  .course li{font-size:12.5px;line-height:1.5;margin-bottom:4px}
+  /* comat + policies */
+  .comat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+  .thr{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .th{background:var(--violetbg);border-radius:10px;padding:8px 12px;text-align:center;min-width:92px}
+  .th b{display:block;font-size:16px;color:var(--violet)}.th span{font-size:11px;color:var(--sub)}
+  .rules{margin:12px 0 0;padding-left:18px}.rules li{font-size:12.5px;line-height:1.5;margin-bottom:4px}
+  .polgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+  .pol{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
+  .pn{font-weight:700;font-size:13px}.pt{color:var(--sub);font-size:12px;margin-top:4px;line-height:1.5}
+  /* contacts */
+  .cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+  .ct{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
+  .cn{font-weight:700}.cr{color:var(--sub);font-size:12px;margin-top:3px;line-height:1.45}
+  .cc{margin-top:7px;font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+  /* resources */
+  .rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+  .rl{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);transition:transform .12s,box-shadow .12s}
+  .rl:hover{transform:translateY(-1px);box-shadow:var(--shadowlg);text-decoration:none}
+  .rn{font-weight:700;font-size:13px;color:var(--brand)}.rnote{color:var(--sub);font-size:12px;margin-top:3px}
+  .ondisk{color:var(--sub);font-size:12px;margin-top:12px;line-height:1.6}
   @media(max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:520px){.hero h1{font-size:23px}.stats{grid-template-columns:1fr}}
 </style>
@@ -169,7 +206,7 @@
     </div>
   </header>
   <nav class="nav"><div class="inner">
-    <a href="#overview">Overview</a><a href="#upcoming">Upcoming</a><a href="#rotations">Rotations</a><a href="#schedule">Schedule</a>
+    <a href="#overview">Overview</a><a href="#upcoming">Upcoming</a><a href="#courses">Courses</a><a href="#rotations">Rotations</a><a href="#schedule">Schedule</a><a href="#policies">Policies</a><a href="#contacts">Contacts</a><a href="#resources">Resources</a>
   </div></nav>
   <div class="wrap">
     <div id="err"></div>
@@ -281,6 +318,7 @@
     var html='<section id="overview"><div class="stats">'+w+'</div>';
     // focus
     if(DATA.focus)html+='<div class="focus"><div class="k">📌 This week\'s focus</div><p>'+esc(DATA.focus)+'</p></div>';
+    if((DATA.flags||[]).length)html+='<div class="flags">'+DATA.flags.map(function(f){return '<div class="flag '+esc(f.tone)+'"><div class="ft">'+esc(f.t)+'</div><div class="fd">'+esc(f.d)+'</div></div>';}).join("")+'</div>';
     html+='</section>';
 
     // ---- upcoming ----
@@ -290,6 +328,16 @@
       '<div class="tabs" id="tabs"><button data-tab="week">This week</button><button data-tab="month">This month</button><button data-tab="all">All</button></div>'+
       '<div class="chips" id="chips"></div></div>'+
       '<div id="uplist"></div></section>';
+
+    // ---- courses ----
+    html+='<section id="courses"><div class="shead"><span class="ico">📚</span><h2>Courses</h2></div>'+
+      '<p class="sdesc">What you owe per course this year — Surgery (active) and Transitions/601.</p>'+
+      '<div class="coursewrap">'+(DATA.courses||[]).map(function(c){
+        return '<div class="course a-'+esc(c.accent)+'"><div class="chead"><div><span class="ccode">'+esc(c.code)+'</span> <span class="cname">'+esc(c.name)+'</span></div><span class="cstat">'+esc(c.status)+'</span></div>'+
+        '<div class="cblurb">'+esc(c.blurb)+'</div>'+
+        '<div class="csub">Requirements</div><ul>'+(c.requirements||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul>'+
+        '<div class="csub">Grading &amp; traps</div><ul>'+(c.notes||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+      }).join("")+'</div></section>';
 
     // ---- rotations ----
     html+='<section id="rotations"><div class="shead"><span class="ico">🎯</span><h2>Rotations</h2></div>'+
@@ -318,6 +366,24 @@
         '<td><b>'+esc(r.item)+'</b>'+(r.det?'<div style="color:var(--sub);font-size:12px;margin-top:2px">'+esc(r.det)+'</div>':'')+'</td>'+
         '<td><span class="pill p-'+esc(r.type)+'">'+esc(r.type)+'</span></td></tr>';}).join("")+
       '</table></details></section>';
+
+    // ---- policies + COMAT ----
+    html+='<section id="policies"><div class="shead"><span class="ico">📋</span><h2>Policies &amp; COMAT rules</h2></div>'+
+      '<p class="sdesc">The clerkship-wide rules that apply on every rotation.</p>'+
+      '<div class="comat"><div class="csub">COMAT grading</div><div class="thr">'+DATA.comat.thresholds.map(function(x){return '<div class="th"><b>'+esc(x.b)+'</b><span>'+esc(x.v)+'</span></div>';}).join("")+'</div>'+
+      '<ul class="rules">'+DATA.comat.rules.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>'+
+      '<div class="polgrid">'+DATA.policies.map(function(p){return '<div class="pol"><div class="pn">'+esc(p.name)+'</div><div class="pt">'+esc(p.text)+(p.link?' <a href="'+esc(p.link)+'" target="_blank" rel="noopener">open ↗</a>':'')+'</div></div>';}).join("")+'</div></section>';
+
+    // ---- contacts ----
+    html+='<section id="contacts"><div class="shead"><span class="ico">📇</span><h2>Contacts</h2></div>'+
+      '<p class="sdesc">Who to email for what.</p>'+
+      '<div class="cgrid">'+DATA.contacts.map(function(c){return '<div class="ct"><div class="cn">'+esc(c.name)+'</div><div class="cr">'+esc(c.role)+'</div><div class="cc">'+(c.email?'<a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>':'')+(c.phone?'<span>'+esc(c.phone)+'</span>':'')+'</div></div>';}).join("")+'</div></section>';
+
+    // ---- resources ----
+    html+='<section id="resources"><div class="shead"><span class="ico">🔗</span><h2>Resources &amp; links</h2></div>'+
+      '<p class="sdesc">Portals, logins and study material you\'ll use all year.</p>'+
+      '<div class="rgrid">'+DATA.resources.portals.map(function(r){return '<a class="rl" href="'+esc(r.url)+'" target="_blank" rel="noopener"><div class="rn">'+esc(r.name)+' ↗</div><div class="rnote">'+esc(r.note)+'</div></a>';}).join("")+'</div>'+
+      '<div class="ondisk"><b>On your computer:</b> '+DATA.resources.onDisk.map(esc).join(" · ")+'</div></section>';
 
     document.getElementById("content").innerHTML=html;
 
