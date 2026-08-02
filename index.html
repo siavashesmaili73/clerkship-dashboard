@@ -219,7 +219,7 @@
   </div>
 </div>
 
-<script src="data.enc.js"></script>
+<script src="data.enc.js?v=3"></script>
 <script>
 (function(){
   "use strict";
@@ -368,22 +368,25 @@
       '</table></details></section>';
 
     // ---- policies + COMAT ----
-    html+='<section id="policies"><div class="shead"><span class="ico">📋</span><h2>Policies &amp; COMAT rules</h2></div>'+
-      '<p class="sdesc">The clerkship-wide rules that apply on every rotation.</p>'+
-      '<div class="comat"><div class="csub">COMAT grading</div><div class="thr">'+DATA.comat.thresholds.map(function(x){return '<div class="th"><b>'+esc(x.b)+'</b><span>'+esc(x.v)+'</span></div>';}).join("")+'</div>'+
-      '<ul class="rules">'+DATA.comat.rules.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>'+
-      '<div class="polgrid">'+DATA.policies.map(function(p){return '<div class="pol"><div class="pn">'+esc(p.name)+'</div><div class="pt">'+esc(p.text)+(p.link?' <a href="'+esc(p.link)+'" target="_blank" rel="noopener">open ↗</a>':'')+'</div></div>';}).join("")+'</div></section>';
+    if(DATA.comat||DATA.policies){
+      html+='<section id="policies"><div class="shead"><span class="ico">📋</span><h2>Policies &amp; COMAT rules</h2></div>'+
+        '<p class="sdesc">The clerkship-wide rules that apply on every rotation.</p>';
+      if(DATA.comat)html+='<div class="comat"><div class="csub">COMAT grading</div><div class="thr">'+(DATA.comat.thresholds||[]).map(function(x){return '<div class="th"><b>'+esc(x.b)+'</b><span>'+esc(x.v)+'</span></div>';}).join("")+'</div>'+
+        '<ul class="rules">'+(DATA.comat.rules||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+      if((DATA.policies||[]).length)html+='<div class="polgrid">'+DATA.policies.map(function(p){return '<div class="pol"><div class="pn">'+esc(p.name)+'</div><div class="pt">'+esc(p.text)+(p.link?' <a href="'+esc(p.link)+'" target="_blank" rel="noopener">open ↗</a>':'')+'</div></div>';}).join("")+'</div>';
+      html+='</section>';
+    }
 
     // ---- contacts ----
-    html+='<section id="contacts"><div class="shead"><span class="ico">📇</span><h2>Contacts</h2></div>'+
+    if((DATA.contacts||[]).length)html+='<section id="contacts"><div class="shead"><span class="ico">📇</span><h2>Contacts</h2></div>'+
       '<p class="sdesc">Who to email for what.</p>'+
       '<div class="cgrid">'+DATA.contacts.map(function(c){return '<div class="ct"><div class="cn">'+esc(c.name)+'</div><div class="cr">'+esc(c.role)+'</div><div class="cc">'+(c.email?'<a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>':'')+(c.phone?'<span>'+esc(c.phone)+'</span>':'')+'</div></div>';}).join("")+'</div></section>';
 
     // ---- resources ----
-    html+='<section id="resources"><div class="shead"><span class="ico">🔗</span><h2>Resources &amp; links</h2></div>'+
+    if(DATA.resources&&DATA.resources.portals)html+='<section id="resources"><div class="shead"><span class="ico">🔗</span><h2>Resources &amp; links</h2></div>'+
       '<p class="sdesc">Portals, logins and study material you\'ll use all year.</p>'+
       '<div class="rgrid">'+DATA.resources.portals.map(function(r){return '<a class="rl" href="'+esc(r.url)+'" target="_blank" rel="noopener"><div class="rn">'+esc(r.name)+' ↗</div><div class="rnote">'+esc(r.note)+'</div></a>';}).join("")+'</div>'+
-      '<div class="ondisk"><b>On your computer:</b> '+DATA.resources.onDisk.map(esc).join(" · ")+'</div></section>';
+      '<div class="ondisk"><b>On your computer:</b> '+(DATA.resources.onDisk||[]).map(esc).join(" · ")+'</div></section>';
 
     document.getElementById("content").innerHTML=html;
 
