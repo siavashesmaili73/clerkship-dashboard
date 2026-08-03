@@ -154,6 +154,10 @@
   .cstat{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--slatebg);color:var(--slate);white-space:nowrap}
   .cblurb{color:var(--sub);font-size:12.5px;margin-top:6px}
   .csub{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--brand);font-weight:800;margin-top:12px}
+  .cguide{margin-top:12px;background:var(--accentsoft, #eef1fd);background:#f6f4ff;border:1px solid #e9e5fb;border-radius:10px;box-shadow:none}
+  .cguide summary{padding:10px 13px;font-size:12.5px;color:var(--violet)}
+  .cguide ol{margin:0;padding:2px 16px 12px 30px}
+  .cguide li{font-size:12.5px;line-height:1.55;margin-bottom:6px}
   .course ul{margin:6px 0 0;padding-left:18px}
   .course li{font-size:12.5px;line-height:1.5;margin-bottom:4px}
   /* comat + policies */
@@ -219,7 +223,7 @@
   </div>
 </div>
 
-<script src="data.enc.js?v=4"></script>
+<script src="data.enc.js?v=5"></script>
 <script>
 (function(){
   "use strict";
@@ -336,7 +340,9 @@
         return '<div class="course a-'+esc(c.accent)+'"><div class="chead"><div><span class="ccode">'+esc(c.code)+'</span> <span class="cname">'+esc(c.name)+'</span></div><span class="cstat">'+esc(c.status)+'</span></div>'+
         '<div class="cblurb">'+esc(c.blurb)+'</div>'+
         '<div class="csub">Requirements</div><ul>'+(c.requirements||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul>'+
-        '<div class="csub">Grading &amp; traps</div><ul>'+(c.notes||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+        '<div class="csub">Grading &amp; traps</div><ul>'+(c.notes||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul>'+
+        (c.guides||[]).map(function(g){return '<details class="cguide"><summary>📖 '+esc(g.t)+'</summary><ol>'+(g.steps||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join("")+'</ol></details>';}).join("")+
+        '</div>';
       }).join("")+'</div></section>';
 
     // ---- rotations ----
