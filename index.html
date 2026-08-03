@@ -163,7 +163,7 @@ textarea.notes{width:100%;min-height:90px;border:1px solid var(--line);border-ra
 </div>
 </div>
 
-<script src="data.enc.js?v=7"></script>
+<script src="data.enc.js?v=8"></script>
 <script>
 (function(){
 "use strict";
@@ -201,7 +201,7 @@ var main=document.getElementById('main');
 var current=DB.get('lastView')||'dashboard';
 
 /* status: user override in localStorage, else default from DATA */
-function defState(r){ if(r.status==='Done')return 'done'; if(r.status==='In progress'||r.status==='Scheduled')return 'prog'; return 'todo'; }
+function defState(r){ if(r.status==='Done')return 'done'; if(r.status==='In progress')return 'prog'; return 'todo'; }
 function rotState(r){ return DB.get('rot_'+r.id+'_status') || defState(r); }
 function rotChecklist(r){ return r.nostd ? (r.extra||[]) : (DATA.stdCheck||[]).concat((r.comat&&r.comat!=='None')?(DATA.comatCheck||[]):[], r.extra||[]); }
 function rotProgress(r){ var items=rotChecklist(r); if(!items.length) return 0; var n=0; items.forEach(function(it){ if(DB.get('chk_'+r.id+'_'+it.id)) n++; }); return Math.round(n/items.length*100); }
@@ -274,8 +274,9 @@ function viewDashboard(){
   var flags=(DATA.flags||[]).map(function(f){var cls=f.tone==='green'?'green':(f.tone==='amber'?'amber':'red');
     return '<div class="box '+cls+'"><b>'+esc(f.t)+'</b> — '+esc(f.d)+'</div>';}).join('');
 
+  var accents={violet:'#7c3aed',sky:'#2c6fbf',green:'#1f9d57',amber:'#e08e0b'};
   var courses=(DATA.courses||[]).map(function(c){
-    return '<details class="acc"'+(c.status==='Active'?' open':'')+'><summary>📚 '+esc(c.code)+' — '+esc(c.name)+' <span class="mini" style="font-weight:400">('+esc(c.status)+')</span></summary><div class="body">'+
+    return '<details class="acc"'+(c.status==='Active'?' open':'')+' style="border-left:4px solid '+(accents[c.accent]||'#18634a')+'"><summary>📚 '+esc(c.code)+' — '+esc(c.name)+' <span class="mini" style="font-weight:400">('+esc(c.status)+')</span></summary><div class="body">'+
       '<p class="mini" style="margin:4px 0 8px">'+esc(c.blurb)+'</p>'+
       '<b style="color:var(--green-d);font-size:13px">Requirements</b><ul>'+(c.requirements||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>'+
       '<b style="color:var(--green-d);font-size:13px">Grading &amp; traps</b><ul>'+(c.notes||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>'+
@@ -284,7 +285,14 @@ function viewDashboard(){
   }).join('');
 
   var pols=(DATA.policies||[]).map(function(p){return '<li><b>'+esc(p.name)+':</b> '+esc(p.text)+(p.link?' <a href="'+esc(p.link)+'" target="_blank" rel="noopener">open ↗</a>':'')+'</li>';}).join('');
-  var cts=(DATA.contacts||[]).map(function(c){return '<div class="ct"><div class="cn">'+esc(c.name)+'</div><div class="cr">'+esc(c.role)+'</div><div class="cc">'+(c.email?'<a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a> ':'')+(c.phone?'<span class="mini">'+esc(c.phone)+'</span>':'')+'</div></div>';}).join('');
+  var comatCard='';
+  if(DATA.comat){
+    comatCard='<div class="card"><h3>🧪 COMAT grading &amp; rules</h3>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'+(DATA.comat.thresholds||[]).map(function(x){return '<span style="background:var(--green-bg);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:13px"><b style="color:var(--green-d)">'+esc(x.b)+'</b> <span class="mini">'+esc(x.v)+'</span></span>';}).join('')+'</div>'+
+      '<ul style="margin:4px 0;padding-left:18px">'+(DATA.comat.rules||[]).map(function(x){return '<li style="font-size:13px">'+esc(x)+'</li>';}).join('')+'</ul></div>';
+  }
+  var cts=(DATA.contacts||[]).map(function(c){var cc=(c.email?'<a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a> ':'')+(c.phone?'<span class="mini">'+esc(c.phone)+'</span>':'');
+    return '<div class="ct"><div class="cn">'+esc(c.name)+'</div><div class="cr">'+esc(c.role)+'</div>'+(cc?'<div class="cc">'+cc+'</div>':'')+'</div>';}).join('');
   var res=(DATA.resources&&DATA.resources.portals||[]).map(function(r){return '<a class="rl" href="'+esc(r.url)+'" target="_blank" rel="noopener"><div class="rn">'+esc(r.name)+' ↗</div><div class="rnote">'+esc(r.note)+'</div></a>';}).join('');
 
   return '<h2 class="title">Dashboard</h2>'+
@@ -298,6 +306,7 @@ function viewDashboard(){
   '</div>'+
   '<div class="card"><h3>⏱ Key dates &amp; countdowns</h3>'+(dlrows||'<p class="mini">Nothing upcoming.</p>')+'<p class="mini" style="margin-top:10px">Full dated timeline (all '+(DATA.calendar||[]).length+' items) lives in the <a href="#" data-view="calendar">Calendar</a> tab.</p></div>'+
   '<div class="card"><h3>📚 Courses</h3>'+courses+'</div>'+
+  comatCard+
   '<div class="card"><h3>📜 Standing policies</h3><ul style="margin:4px 0;padding-left:18px">'+pols+'</ul></div>'+
   '<div class="card"><h3>📇 Contacts</h3>'+cts+'</div>'+
   '<div class="card"><h3>🔗 Portals &amp; links</h3>'+res+
@@ -320,6 +329,13 @@ function viewRotation(id){
   }).join('');
   var noteVal=DB.get('note_'+r.id)||'';
   var mcl = r.id==='surg' ? '<div class="box blue"><b>Site playbook:</b> daily shape, teams, expectations, people and preceptor contacts live on the <a href="#" data-view="mclaren">McLaren Macomb page</a>.</div>' : '';
+  var courseCard='';
+  (DATA.courses||[]).forEach(function(c){ if(c.code===r.code){
+    courseCard='<div class="card"><h3>📚 '+esc(c.code)+' course detail</h3><p class="mini" style="margin:0 0 8px">'+esc(c.blurb)+'</p>'+
+      '<b style="color:var(--green-d);font-size:13px">Requirements</b><ul style="padding-left:18px;margin:4px 0">'+(c.requirements||[]).map(function(x){return '<li style="font-size:13px">'+esc(x)+'</li>';}).join('')+'</ul>'+
+      '<b style="color:var(--green-d);font-size:13px">Grading &amp; traps</b><ul style="padding-left:18px;margin:4px 0">'+(c.notes||[]).map(function(x){return '<li style="font-size:13px">'+esc(x)+'</li>';}).join('')+'</ul>'+
+      (c.guides||[]).map(function(g){return '<details class="acc" style="margin-top:8px"><summary>📖 '+esc(g.t)+'</summary><div class="body"><ol>'+(g.steps||[]).map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ol></div></details>';}).join('')+'</div>';
+  }});
   return '<h2 class="title">'+esc(r.name)+'</h2>'+
   '<p class="sub">'+esc(r.code||'')+' &nbsp; '+badge+' '+cb+' '+hon+(r.dates?' &nbsp; <b>'+esc(r.dates)+'</b>':'')+'</p>'+
   (r.notes?'<div class="box blue">'+esc(r.notes)+'</div>':'')+mcl+
@@ -329,6 +345,7 @@ function viewRotation(id){
     '<button data-st="'+r.id+'|done" class="'+(st==='done'?'sel':'')+'">Done</button></div>'+
   '<div class="card"><div class="barlabel"><span><b>Checklist</b></span><span>'+pct+'%</span></div><div class="bar"><i style="width:'+pct+'%"></i></div>'+
     '<ul class="chk" style="margin-top:10px">'+list+'</ul></div>'+
+  courseCard+
   '<div class="card"><h3>📝 Notes for this rotation</h3>'+
     '<textarea class="notes" data-note="'+r.id+'" placeholder="Preceptor, site, schedule quirks, COMAT date, things to remember…">'+esc(noteVal)+'</textarea>'+
     '<p class="mini" style="margin-top:6px">Saves automatically on this device.</p></div>';
@@ -392,7 +409,7 @@ function viewCalendar(){
     var isNow=t>=s&&t<=e, isPast=e<t;
     var cls=(kc[b.kind]||'')+(isNow?' now':'')+(isPast?' past':'');
     return '<tr class="'+cls+'"><td><b>'+esc(b.name)+'</b>'+(isNow?'<span class="nowtag">NOW</span>':'')+(b.plan?'<div class="small">'+esc(b.plan)+'</div>':'')+'</td>'+
-      '<td style="white-space:nowrap">'+fs(s)+' – '+fs(e)+((s.getFullYear()!==e.getFullYear())?' '+e.getFullYear():' '+e.getFullYear())+'</td>'+
+      '<td style="white-space:nowrap">'+fs(s)+(s.getFullYear()!==e.getFullYear()?' '+s.getFullYear():'')+' – '+fs(e)+' '+e.getFullYear()+'</td>'+
       '<td>'+esc(b.kind||'')+(b.notes?'<div class="small">'+esc(b.notes)+'</div>':'')+'</td></tr>';
   }).join('');
   var cal=(DATA.calendar||[]).slice().sort(function(a,b){return (a.d||'')<(b.d||'')?-1:1;});
